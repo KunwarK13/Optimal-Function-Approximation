@@ -1,16 +1,24 @@
-import java.util.Arrays;
 import java.io.*;
 import java.util.Scanner;
 public class OrthogonalProjection {
     public static void main(String[] args) throws IOException {
-        Scanner sc = new Scanner(System.in);
-        String s = sc.nextLine();
-        Func f = new Func(s);
-        Polynomial approx = approximate(f, 5, new Interval("-1", "1"));
-        System.out.println(approx.getValue());
-        System.out.println(Arrays.toString(approx.getCoefficients()));
-        System.out.println(approx.getExpandedForm());
-        System.out.println(approx.getDesmosForm());
+        Scanner sc1 = new Scanner(System.in);
+        System.out.println("Enter function:");
+        String s = sc1.nextLine();
+        Func f = new Func(processInput(s));
+
+        System.out.print("Enter degree: ");
+        int deg = sc1.nextInt();
+
+        Scanner sc2 = new Scanner(System.in);
+        System.out.println("Enter interval start:");
+        String start = processInput(sc2.nextLine());
+        System.out.println("Enter interval end:");
+        String end = processInput(sc2.nextLine());
+
+        System.out.println("Finding approximation...");
+        Polynomial approx = approximate(f, deg, new Interval(start, end));
+        approx.infoToFile();
     }
 
     public static Polynomial approximate(Func f, int deg, Interval I) throws IOException {
@@ -43,5 +51,12 @@ public class OrthogonalProjection {
 
     public static Func innerProduct(Func f1, Func f2, Interval I) throws IOException {
         return FunctionUtil.integrate(f1, f2, I);
+    }
+
+    public static String processInput(String input) {
+        input = input.replaceAll("e\\^\\(([^)]+)\\)|e\\^(\\w+)", "exp($1$2)");
+        input = input.replaceAll("(\\w+)\\^([^\\s]+|\\([^)]+\\))", "$1**($2)");
+        input = input.replaceAll("\\be(?![\\^\\w])\\b", "E");
+        return input;
     }
 }
